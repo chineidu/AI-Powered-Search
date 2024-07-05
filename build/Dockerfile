@@ -52,13 +52,19 @@ ENV SPARK_OPTS="$SPARK_OPTS --driver-java-options=\"-DXlint:none -Dlog4j.logLeve
 
 # If you want to edit the notebooks and have your changes persist, 
 # uncomment the line below and restart with `docker compose up --build`
-#WORKDIR /tmp/notebooks
+WORKDIR /tmp/notebooks
 
 # Mark all notebooks as trusted by default
-RUN find . -name \*.ipynb -print0|xargs -0 jupyter-trust -y
+# RUN find . -name \*.ipynb -print0|xargs -0 jupyter-trust -y
+RUN find . -name \*.ipynb -print0 | xargs -0 -I {} sh -c 'if [ -s "{}" ]; then jupyter-trust "{}"; fi'
+
 
 # Start Jupyter Notebooks
 RUN jupyter labextension disable "@jupyterlab/apputils-extension:announcements"
+
+# CMD start-notebook.sh --ServerApp.token='' --ServerApp.ip=0.0.0.0 --no-browser \
+#   --LabApp.default_url='/lab/tree/chapters/welcome.ipynb' --NotebookApp.token='' --LabApp.token='' \
+#   --NotebookApp.allow_origin='*' --NotebookApp.ip='0.0.0.0'
 CMD start-notebook.sh --ServerApp.token='' --ServerApp.ip=0.0.0.0 --no-browser \
   --LabApp.default_url='/lab/tree/chapters/welcome.ipynb' --NotebookApp.token='' --LabApp.token='' \
-  --NotebookApp.allow_origin='*' --NotebookApp.ip='0.0.0.0'
+  --NotebookApp.allow_origin='*' --NotebookApp.ip='0.0.0.0' --ServerApp.disable_check_xsrf=True
