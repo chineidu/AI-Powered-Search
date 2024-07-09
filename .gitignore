@@ -137,3 +137,5 @@ dmypy.json
 
 # Custom
 **/*.json
+**/qdrant_storage
+**/note.py
